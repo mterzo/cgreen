@@ -21,7 +21,9 @@ Constraint static_is_non_null_constraint = {
     /* .stored_value */ (intptr_t)NULL,
     /* .stored_value_name */ "null",
     /* .parameter_name */ NULL,
-    /* .size_of_stored_value */ 0
+    /* .size_of_stored_value */ 0,
+    /* .ctx */ NULL,
+    /* .compare_custom */ NULL
 };
 
 Constraint static_is_null_constraint = {
@@ -35,7 +37,9 @@ Constraint static_is_null_constraint = {
     /* .stored_value */ (intptr_t)NULL,
     /* .stored_value_name */ "null",
     /* .parameter_name */ NULL,
-    /* .size_of_stored_value */ 0
+    /* .size_of_stored_value */ 0,
+    /* .ctx */ NULL,
+    /* .compare_custom */ NULL
 };
 
 Constraint static_is_false_constraint = { 
@@ -49,7 +53,9 @@ Constraint static_is_false_constraint = {
     /* .stored_value */ false,
     /* .stored_value_name */ "false",
     /* .parameter_name */ NULL,
-    /* .size_of_stored_value */ 0
+    /* .size_of_stored_value */ 0,
+    /* .ctx */ NULL,
+    /* .compare_custom */ NULL
 };
 
 Constraint static_is_true_constraint = { 
@@ -63,7 +69,9 @@ Constraint static_is_true_constraint = {
     /* .stored_value */ true,
     /* .stored_value_name */ "true",
     /* .parameter_name */ NULL,
-    /* .size_of_stored_value */ 0
+    /* .size_of_stored_value */ 0,
+    /* .ctx */ NULL,
+    /* .compare_custom */ NULL
 };
 
 Constraint *is_non_null = &static_is_non_null_constraint;

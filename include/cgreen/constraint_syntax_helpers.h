@@ -38,7 +38,9 @@ extern "C" {
 #define will_return(value) create_return_value_constraint((intptr_t)value)
 #define will_set_contents_of_parameter(parameter_name, value, size) create_set_parameter_value_constraint(#parameter_name, (intptr_t)value, (size_t)size)
 
-
+#define with_context(ctx) ctx
+#define by_comparator(func) func
+#define is_customly_equal_to(value, func, ctx) create_customly_equal_constrait(value, #value, func, ctx)
 
 /* these constraints don't take arguments, and we don't want to force users to put "()" on the end of every usage.
  * we also want to avoid macros when practical, for the namespacing and confusing symbol collision issues, 

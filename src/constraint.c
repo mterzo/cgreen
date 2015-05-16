@@ -48,7 +48,8 @@ static void test_want_double(Constraint *constraint, const char *function, intpt
 static bool compare_do_not_want_double(Constraint *constraint, intptr_t actual);
 static void test_do_not_want_double(Constraint *constraint, const char *function, intptr_t actual, const char *test_file, int test_line, TestReporter *reporter);
 static void set_contents(Constraint *constraint, const char *function, intptr_t actual, const char *test_file, int test_line, TestReporter *reporter);
-
+static void test_want_custom(Constraint *constraint, const char *function, intptr_t actual, const char *test_file, int test_line, TestReporter *reporter);
+static bool compare_custom(Constraint *constraint, intptr_t actual);
 
 static const char *default_expected_value_message = "\t\texpected value:\t\t\t[%" PRIdPTR "]";
 
@@ -60,6 +61,8 @@ Constraint *create_constraint() {
     constraint->failure_message = &failure_message_for;
     constraint->expected_value_name = NULL;
     constraint->expected_value_message = default_expected_value_message;
+    constraint->ctx = NULL;
+    constraint->compare_custom = NULL;
 
     return constraint;
 }
@@ -295,6 +298,21 @@ Constraint *create_set_parameter_value_constraint(const char *parameter_name, in
     constraint->expected_value = value_to_set;
     constraint->size_of_expected_value = size_to_set;
     constraint->parameter_name = parameter_name;
+
+    return constraint;
+}
+
+Constraint *create_customly_equal_constrait(intptr_t expected_value, const char *expected_value_name,
+                                            bool (*fn)(intptr_t, intptr_t, void *), void *ctx)
+{
+    Constraint *constraint = create_constraint_expecting(expected_value, expected_value_name);
+    constraint->type = VALUE_COMPARER;
+
+    constraint->compare = compare_custom;
+    constraint->execute = &test_want_custom;
+    constraint->name = "equal customly";
+    constraint->ctx = ctx;
+    constraint->compare_custom = fn;
 
     return constraint;
 }
@@ -543,6 +561,31 @@ bool constraint_is_for_parameter_in(const Constraint *constraint, const char *na
     return found;
 }
 
+static void test_want_custom(Constraint *constraint, const char *function, intptr_t actual, const char *test_file, int test_line, TestReporter *reporter)
+{
+    if (constraint->compare_custom == NULL) {
+        (*reporter->assert_true)(
+            reporter,
+            test_file,
+            test_line,
+            false,
+            "Custom compare doesn't contain compare function");
+        return;
+    }
+
+    (*reporter->assert_true)(
+            reporter,
+            test_file,
+            test_line,
+            (*constraint->compare)(constraint, actual),
+            "Custom compare failed in function [%s]",
+            function);
+}
+
+static bool compare_custom(Constraint *constraint, intptr_t actual)
+{
+    return constraint->compare_custom(constraint->expected_value, actual, constraint->ctx);
+}
 
 #ifdef __cplusplus
 } // namespace cgreen

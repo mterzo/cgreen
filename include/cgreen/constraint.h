@@ -38,6 +38,10 @@ struct Constraint_ {
     /* for PARAMETER constraints */
     const char *parameter_name;
     size_t size_of_expected_value;
+
+    /* for CUSTOM */
+    void *ctx;
+    bool (*compare_custom)(intptr_t, intptr_t, void *);
 };
 
 Constraint *create_constraint();
@@ -71,6 +75,7 @@ Constraint *create_equal_to_double_constraint(double expected_value, const char 
 Constraint *create_not_equal_to_double_constraint(double expected_value, const char *expected_value_name);
 Constraint *create_return_value_constraint(intptr_t value_to_return);
 Constraint *create_set_parameter_value_constraint(const char *parameter_name, intptr_t value_to_set, size_t size_to_set);
+Constraint *create_customly_equal_constrait(intptr_t expected_value, const char *expected_value_name, bool (*fn)(intptr_t, intptr_t, void *), void *ctx);
 
 bool no_expected_value_in(const Constraint *constraint);
 bool values_are_strings_in(const Constraint *constraint);
