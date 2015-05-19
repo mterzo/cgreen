@@ -42,6 +42,8 @@ static bool compare_do_not_want_substring(Constraint *constraint, intptr_t actua
 
 static bool compare_want_beginning_of_string(Constraint *constraint, intptr_t actual);
 
+static intptr_t fetch_arg_intptr(va_list va);
+static intptr_t fetch_arg_double(va_list va);
 
 static bool compare_want_double(Constraint *constraint, intptr_t actual);
 static void test_want_double(Constraint *constraint, const char *function, intptr_t actual, const char *test_file, int test_line, TestReporter *reporter);
@@ -59,6 +61,7 @@ Constraint *create_constraint() {
     constraint->parameter_name = NULL;
     constraint->destroy = &destroy_empty_constraint;
     constraint->failure_message = &failure_message_for;
+    constraint->fetch_arg = &fetch_arg_intptr;
     constraint->expected_value_name = NULL;
     constraint->expected_value_message = default_expected_value_message;
     constraint->ctx = NULL;
@@ -258,6 +261,7 @@ Constraint *create_equal_to_double_constraint(double expected_value, const char 
 
     constraint->compare = &compare_want_double;
     constraint->execute = &test_want_double;
+    constraint->fetch_arg = &fetch_arg_double;
     constraint->name = "equal double";
     constraint->destroy = &destroy_double_constraint;
 
@@ -270,6 +274,7 @@ Constraint *create_not_equal_to_double_constraint(double expected_value, const c
 
     constraint->compare = &compare_do_not_want_double;
     constraint->execute = &test_do_not_want_double;
+    constraint->fetch_arg = &fetch_arg_double;
     constraint->name = "not equal double";
     constraint->destroy = &destroy_double_constraint;
 
@@ -374,6 +379,18 @@ static void set_contents(Constraint *constraint, const char *function, intptr_t 
 }
 
 
+static intptr_t fetch_arg_intptr(va_list ap)
+{
+    return va_arg(ap, intptr_t);
+}
+
+static intptr_t fetch_arg_double(va_list ap)
+{
+    double val;
+
+    val = va_arg(ap,double);
+    return box_double(val);
+}
 
 void test_want(Constraint *constraint, const char *function, intptr_t actual, const char *test_file, int test_line, TestReporter *reporter) {
     char *message;
